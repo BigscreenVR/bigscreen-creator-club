@@ -1,5 +1,5 @@
 # Bigscreen Environment Setup
-This document will go through the process of setting up your Unity scene to work in Bigscreen. If you have not already, extract the _BigscreenTemplate_v1.unitypackage_ file and put it somewhere accessible. **Completing sections 1-5 are required to get your environment accepted!**
+This document will go through the process of setting up your Unity scene to work in Bigscreen. If you have not already, extract the _BigscreenTemplate_v2.unitypackage_ file and put it somewhere accessible. **Completing sections 1-5 are required to get your environment accepted!**
 
 Because Bigscreen is cross-platform for both PCVR and Quest, there are some restrictions in place to ensure your environment runs well within Bigscreen for everyone:
 - ❌ No Extensive Scripting: Avoid complex scripts. Simple scripts, like rotating objects, are allowed.
