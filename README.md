@@ -1,14 +1,14 @@
 # Bigscreen Environment Setup
-This document will go through the process of setting up your Unity scene to work in Bigscreen. If you have not already, extract the _BigscreenTemplate_v2.unitypackage_ file and put it somewhere accessible. **Completing sections 1-5 are required to get your environment accepted!**
+This document will go through the process of setting up your Unity scene to work in Bigscreen. If you have not already, extract the _BigscreenTemplate_v3.unitypackage_ file and put it somewhere accessible. **Completing sections 1-5 are required to get your environment accepted!**
 
 Because Bigscreen is cross-platform for both PCVR and Quest, there are some restrictions in place to ensure your environment runs well within Bigscreen for everyone:
-- ❌ No Extensive Scripting: Avoid complex scripts. Simple scripts, like rotating objects, are allowed.
+- ❌ Scripts are not supported with loading a BCC environment at this time.
 - 🔺Triangle Count Max 120k: Total number of triangles should not exceed **120,000**.
 - 📂 File Size Limit: Ensure all environment files (meshes, textures, audio, materials, and scenes) altogether don't exceed **70MB**.
 - ⚠️ **No Copyrighted Work**: Make sure you have the rights to use all assets in your environment.
 - 🛠️ Unity editor version **2020.3.33f1** is required. Using any newer major version of Unity editor can cause integration issues with your environment.
 - 💡 No realtime lighting setups.
-- 🔎 At this time, using Normal maps or Metallic maps are not recommended. They won't be used when integrating your environment submission and would only contribute to the allotted size limit.
+- 🔎 At this time, using Normal maps or Metallic maps are not recommended. They won't be enabled when integrating your environment submission and would only contribute to the allotted size limit.
 - 🌐 No baked in materials. If your imported meshes have included materials, you must extract them into your unique materials folder. More details in section 4. 
 
 ## 1) Unity Project
@@ -37,12 +37,15 @@ You should have an app called _Unity Hub_ installed. Download here: https://unit
 <br>
 
 ## 2) Project Preparation
+> [!WARNING]
+> Often previous Bigscreen template versions are not compatible with the latest one. It's recommended to use the newest template file only when starting a brand new project and not in a existing project that uses an older template.
+
 In the created project from _section 1_, you will start in a _SampleScene_. In the _Project_ window, right click the _Scenes_ folder and delete it.
 ![image](https://github.com/user-attachments/assets/0fd613cb-45f5-46a5-a221-526d6e26b986)
 
 
 1. In the top bar of Unity, click _Assets_ > _Import Package_ > _Custom Package..._
-2. Go to the _BigscreenTemplate_v2.unitypackage_ file you extracted earlier and open it.
+2. Go to the _BigscreenTemplate_v3.unitypackage_ file you extracted earlier and open it.
 3. An import window will appear in Unity. Make sure all the files are ticked then click _Import_.
 
 ![image](https://github.com/user-attachments/assets/0fe36cc4-68e3-4870-a5da-b46682cfa2ec)
@@ -70,18 +73,16 @@ In the created project from _section 1_, you will start in a _SampleScene_. In t
 <br>
 
 ## 3) Integrating with the Template
-The template has three root objects:
+The template has four root objects:
 - **_Areas_** -- this contains the seats, collisions, and screen placeholders for Bigscreen to use.
 - **_Environment_** -- this should house your environment's mesh GameObjects.
 - **_Lighting_** -- this will contain lighting objects for your environment including screen emissives. More on this in the _Lightbaking_ section.
+- **_ScreenLitMaps_** -- this object is used to include screenlit lightmaps with your sideloaded environment. More on this in the _Testing and sideloading_ section.
 
 > [!TIP]
 > In _TemplateAssets_ > _Prefabs_ > _Environments_, there is a _ScaleReferenceFigure_ asset that you can drag into your scene for referencing the scale of your environment and seating with a Bigscreen avatar. Note: This is not an asset to export with your environment.
 > 
 > ![image](https://github.com/user-attachments/assets/7d3b21ce-fe4f-4c0c-886c-399dd58b750c)
-
-> [!CAUTION]
-> Some objects in the template will have missing script components. **Do not remove these components as they hold important references and doing so will cause integration problems with your submission which will end up not being accepted.**
 
 > [!IMPORTANT]
 > All objects in your environment must be contained within the _SceneRoot_.
@@ -89,38 +90,33 @@ The template has three root objects:
 Let's explain what the objects in the template are for. **Items with (*) are required setup for accepting environment submission.**
 
 ### Seats*
-There are two seat prefabs for use in Bigscreen:
-- **_Seat_** -- these are primarily used for the main viewing seats you want users at. The _bigscreen_ placeholder illustrates the direction the user will orient when teleporting to that seat and the default position a floating monitor will end up when resetting its position.
-- **_SeatTransitional_** -- these are the floor panels that are used for moving around the environment. They are typically used in flat open spaces with less suitable viewing spots. The _bigscreen_ placeholder illustrates the default position a floating monitor will end up when resetting its position.
+There is an important object that Bigscreen uses. These are called *Seats* and they are primarily used for the main viewing spots you want users at and where users first spawn when they enter your environment. The *Bigscreen* placeholder illustrates the direction the user will orient when teleporting to that seat.
+
+> [!IMPORTANT]
+> 15 or more starting seats are required to work with a full room in Bigscreen. It is recommended to keep your max seat count **below 200**.
 
 > [!WARNING]
-> Do not modify the seat prefabs nor unpack them as it can cause integration problems and your submission will end up not being accepted. They are only meant for moving and rotating around in your environment. You can duplicate or remove the seat objects as you please.
-
-> [!WARNING]
-> 15 or more starting seats are required to work with a full room in Bigscreen. It is recommended to keep your max seat count **below 800** with the max _SeatTransitional_ objects being **600** and _Seat_ objects being **200**.
-
-> [!WARNING]
-> There should not be any seats that are set inactive. If you don't need a seat object, you must delete it.
+> There should not be any seats that are kept in the scene and set inactive. If you don't need a seat object, you must delete it.
 
 > [!TIP]
 > We recommend using Unity's snap settings for moving seats around in an even fashion. You can set the snap increment by going to _Edit_ > _Grid and Snap Settings..._ > _Increment Snap_. **You hold _CTRL_ while moving an object to start snapping it in increments.**
->  - **For _SeatTransitional_ objects, they use an increment of _0.8_ for forming a grid.**
 >  - **_Seat_ objects can be any spacing you want but it is recommended to have equal spacing when possible.**
 > 
 > ![image](https://github.com/user-attachments/assets/4661d82b-8ef6-4bd4-9e41-6d0432b8fadf)
 
 
 The order that users spawn into their seats is sorted based on the upper-most seat in the hierarchy within the _Seats_ object. The first seat at the very top will be the default seat the host spawns at. The seat object below it will be the seat the first user that joins the host's room spawns at then so on and so forth. It is ideal to give the default seats the best possible viewing spot in your environment.
+
 ![image](https://github.com/user-attachments/assets/8fa36ec2-e676-44b3-b501-e94061d85e53)
 
 
 ### Screens*
 Provided are two screen objects under _Areas_:
 - **_ScreenPlaceholder_** -- this is where the primary screen will appear in your environment. It is where the host's desktop and any other screen-related content will be positioned at. You can adjust the position and rotation of this as you please. **There should only be one _ScreenPlaceholder_ in your environment.**
-- **_MirroredScreenContainer_** (optional) -- this has the mirrored screen which as the name suggests will mirror what the room host's primary screen is showing. This is optional and if you don't plan to use mirrored screens, it is recommended to delete it from the scene. You can adjust the size of the mirrored screen by changing the size of the inner _MirroredScreen_ object inside the container. Do not change the rotation or position of this object. Only do that on the _MirroredScreenContainer_ itself. You can duplicate the _MirroredScreenContainer_ to add more screens but at this time, we require that you only have 30 mirrored screens or less.
+- **_MirroredScreen_** (optional) -- this is a mirrored screen which as the name suggests will mirror what the room host's primary screen is showing. This is optional and if you don't plan to use mirrored screens, it is recommended to delete it from the scene. You can adjust the size of the mirrored screen by changing the size of the inner _ScreenBounds_ object inside the container. Do not change the rotation or position of the _ScreenBounds_ object. Only do that on the _MirroredScreen_ itself. You can duplicate the _MirroredScreen_ to add more screens but at this time, we require that you only have **30 mirrored screens** or less.
 
 > [!CAUTION]
-> The aspect ratio of the _ScreenPlaceholder_ and _MirroredScreen_ must stay as **16:9**. Changing it outside of 16:9 will cause stretching issues of screen content in Bigscreen. You should scale the screens appropriately by enabling the _Scale Tool_ in Unity then dragging the center white cube of the scale tool to change the size of the screen.
+> The aspect ratio of the _ScreenPlaceholder_ must stay as **16:9**. Changing it outside of 16:9 will cause stretching issues of screen content in Bigscreen. You should scale the screens appropriately by enabling the _Scale Tool_ in Unity then dragging the center white cube of the scale tool to change the size of the screen.
 > 
 > ![image](https://github.com/user-attachments/assets/1c88582e-9379-4a23-a605-3e4152e728d0)
 
@@ -132,41 +128,67 @@ Provided are two screen objects under _Areas_:
 
 
 ### Colliders*
-It's important to get your environment's collision setup. Otherwise toys will fall through geometry and will not make a good user experience. This is a required step to get your environment submission accepted.
-Under _Colliders_, there are four _BoxCollider_ GameObjects representing the collision of the environment. You should add or remove any collider objects and adjust them to suit your environment's needs.
-You can resize the _BoxCollider_ objects by using the bounding volume editor.
-![image](https://github.com/user-attachments/assets/dc42c629-dbed-4a4c-a37e-56c319ece5ab)
+It's important to give your environment a good coat of collision. **The collision you setup also determines where users can free teleport to.** Otherwise a user can not teleport to an intended area or toys could fall through geometry and not make a good user experience. This is a required step to get your environment submission accepted.
 
+There are two supported ways to add collision on an object:
 
-Optionally, you can attach _BoxCollider_ components to your mesh GameObjects and adjust the bounding size there. With that setup, however, you must make sure the Layer assigned to your mesh GameObjects are on _Ignore Raycast_.
+1. Attach _BoxCollider_ components to your mesh GameObjects and adjust the bounding size. You must make sure the Layer assigned to your GameObjects with collision components attached are on _Ignore Raycast_.
+
+2. Use an empty *Collider* object and reposition / resize to fit your surface. An example is under the *Colliders* object in the template.
+
+The template has examples for both of these uses.
+
+![image](https://github.com/user-attachments/assets/6441f41d-a3cb-431c-afdb-a4f5353aa1ad)
 
 > [!NOTE]
 > Mesh Colliders are permitted as long as they are used sparingly and are very low poly (under 1,000 triangles). For example, using Mesh Colliders for flat flooring, flat walls, dectorative objects, or duplicated theater seats are not permitted use cases.
 
 > [!WARNING]
-> You should aim to have your collision flush with the environment's geometry. Having noticeable collision offset from the ground or floor as an example would not make an acceptable environment submission.
+> You should aim to have your collision flush with the environment's geometry. Having severe collision offset from the ground or floor as an example would not make an acceptable environment submission.
 
 > [!WARNING]
-> Avoid having missing collision in areas that users can reach. This can be either from throwing toys or teleporting to areas via seats.
+> Avoid having missing collision in areas that users can reach. For example: Part of a bedroom having gaping collision in one of the corners.
 
 > [!TIP]
 > You can check your collision by going to _Window_ > _Analysis_ > _Physics Debugger_ then enable _Gizmos_ and _Collision Geometry_ in the scene view. This will show highlights of your environment's geometry.
 
+### No-Go Zones*
+These are boundaries where the user cannot free teleport to. The no-go boundaries don't interaction with toys or other objects in the app so they can overlap your environment's collision. If you have an area with collsion that you don't want users free teleporting to, it is strongly recommended to set this up.
+
+The following shows how a *no-go zone* operates:
+
+![nogo](https://github.com/user-attachments/assets/6e3d4ae9-edbb-4aca-88e0-380b1f3e62e2)
+
+<br>
+There are cases that no-go zones are required. A few common cases that should use no-go zones:
+
+- **_Ceilings_** -- if there is ceiling collision, a user can teleport on top of it and in most cases, won't be able to get back down. To prevent this, add a no-go zone that fully overlaps your ceiling collider.
+
+![image](https://github.com/user-attachments/assets/6be805d2-889a-4d0f-a696-7f9cc434afc0)
+
+- **_Cinema layout seating_** -- if you have a cinema layout with seat collision in rows back-to-back, add a no-go zone overlapping the entire seating area to prevent free teleporting onto the seat collision right in front of the user. This also restricts the cinema viewing spots so users can't easily stand up blocking the view for others.
+
+![image](https://github.com/user-attachments/assets/1eef993b-fc5a-417f-a143-dd25a7c4c1ad)
+
+- **_Outside walls_** -- floor collisions that extend passed any walls should have the excess amount within a no-go zone to prevent users from easily going out of your environment's boundaries. The top of your wall collision should also be within the no-go zone as it is similar to ceiling collision.
+
+![image](https://github.com/user-attachments/assets/f2b277d2-ce0d-4c2e-9dee-fcedef23e230)
+
+
 ### Camera Tool Angles
 Under _Cameras_ there are three _CameraAnchor_ objects. These are used by the app's Camera tool's _2, 3, and 4_ angles. The arrows indicate where the camera will position and orient in your environment. You can move and rotate the camera anchors as you please. Avoid changing the inner _Indicator_ object though.
+
 ![image](https://github.com/user-attachments/assets/8b19509b-321d-41e0-a107-63c5cee68f21)
 
 
 ### MonitorOcclusionDetector
 The bounding box collider of this object is used to tell when a user's floating monitor is outside the environment when switching environments. If a monitor is outside the bounds when entering the environment, the monitor resets to its default position in front of the user. It is recommended to set this BoxCollider boundary size to roughly fit your environment's geometry and just below your primary flooring.
+
 ![image](https://github.com/user-attachments/assets/9a30413b-1115-4098-94bf-549dbe601612)
 
 
 Let's start integrating with the template. In this example, we will walk through making a simple environment with a giant donut and a big screen in front.
 1. If not already unpacked, we first right click _SceneRoot_ in the _Hierarchy_ window then click _Prefab_ > _Unpack_.
-> [!CAUTION]
-> Avoid using _Prefab_ > _Unpack Completely_. Doing this will remove object references that are required for integrating your submission into Bigscreen.
-
 2. We then remove the template's floor and table objects under _Environment_.
 3. Next, let's add the donut mesh. We'll take a .fbx donut mesh for this example and copy it into _Models_ > _LargeDonut_Q_Q_ through File Explorer.
 4. We will click the _Donut_ mesh and drag it into the _Environment_ object in the _Hierarchy_.
@@ -380,6 +402,18 @@ _It is recommended to enable shadows on your light objects to make your lightbak
 
 ![image](https://github.com/user-attachments/assets/3ff66e0b-5df8-44e8-b933-0e46e130ffa9)
 
+27. For the _screen lit_ lightbakes to be included when sideloading, you will need to assign them to the *ScreenLitMaps* object under *SceneRoot*
+
+![image](https://github.com/user-attachments/assets/3cedf34c-ac48-447a-bbd3-a0378756d173)
+
+28. The lightmap files should be assigned in ascending order so lightmap 0 is at the top, 1 is right below it, etc.
+
+29. With *ScreenLitMaps* shown in *Inspector* click the lock icon to prevent the window from changing.
+
+30. Highlight all your lightmap files in your _ScreenLitVariants_ folder and drag them to the *Screen Lit Maps* list. Ensure the order of your lightmaps are ascending. You can drag each element in the list.
+
+![image](https://github.com/user-attachments/assets/ea7323fa-5741-4c46-a1a5-f0d2a80149c9)
+
 
 🎉Lightbaking is now done! Next we will go over exporting your environment so it can integrate into Bigscreen smoothly.
 
@@ -412,8 +446,80 @@ If you are having trouble with lightbaking some objects or with the whole scene,
 <br>
 <br>
 
-## 5) Exporting your Environment
-When exporting your environment, you need to make sure all of your environment's assets are under _UserEnvironments_ and under the subfolders you created from _section 2_. Failure to do so will cause missing assets to occur when integrating your environment into Bigscreen. You must also export assets that are **only used in your environment** and no extra assets left over from other environment projects or what you no longer require.
+## 5) Testing and sideloading
+You now can sideload your environment in Bigscreen! This step is optional but useful to find and fix issues early on that can greatly speed up your submission review. The feature works by building your environment into an addressable which is then placed into your local Bigscreen installation files for either the Steam or Meta app.
+
+A few notes on sideloading:
+- The feature is PCVR only!
+- Multiplayer is supported but only if each guest in your room has a copy of your built environment placed into their Bigscreen installation files. Anyone who enters your room without the files will appear in void space.
+- Any scripts in your scene will be disabled as your environment loads at startup.
+
+### Setup
+- Click the following video below to watch as it will walk you through building your environment's scene to load into Bigscreen.
+
+[![Sideload tutorial](https://github.com/user-attachments/assets/0e4a2c9c-3bf6-495f-88be-75049a5f180d)](https://youtu.be/6vEoDAVUi9w)
+
+- If your environment loaded successfully, the message in the figure below will appear. If your scene failed to load, a brief message will display explaining any known reason.
+
+![image](https://github.com/user-attachments/assets/ec322021-3218-42d1-9991-2e256081bc8d)
+
+### Lighting tuneup
+Once your scene has loaded, you can adjust the environment's lighting to get accurate screen lighting parameters dialed in. Depending on how the main screen in your scene is oriented, the content on-screen will not lineup with the lighting cast onto your environment out of the box. Use the three toggles in the *Ambience Settings* page to adjust the lighting direction and to dial in other settings to fit your environment's mood.
+
+![lightingTune](https://github.com/user-attachments/assets/85ceb447-960b-41ea-b868-704496af0fb3)
+
+Use [this video](https://github.com/user-attachments/assets/18e75d71-c712-4221-812d-c08b2e9e0160) with Bigscreen's videoplayer to help get your lighting lined up.
+
+- Use the *Ambient lighting* slider to get your intended default ambient lighting set. This is the ambient lighting value the environment defaults to either from entering your environment or once content is shown on-screen.
+- You can also adjust the *Screen light intensity* value. It's recommended to test this adjustment using a solid white color on your screen and at your desired default *Ambient lighting* value. Avoid overexposure of the screen lighting onto your environment as pointed out in the figure below.
+
+![image](https://github.com/user-attachments/assets/39bf8315-30ae-4465-8f2b-a84434a6361c)
+
+- Adjust the *Screen light falloff* value to control how far away from the main screen the lighting goes.
+- There's a list of built-in Bigscreen skyboxes you can use with your submission. If you prefer a custom skybox, see the steps on setting that up below.
+
+**Once you dialed in your lighting, take a screenshot of the page and provide it in your ticket!**
+
+### Adding a custom skybox
+1. In the *Project* window, locate the skybox material to be loaded with your scene. Enable the *Addressable* option.
+
+![image](https://github.com/user-attachments/assets/75f80af3-47c1-4c5a-88db-e1fb5c45daca)
+
+2. In the *Addressable Groups* window, make sure the address name for your skybox material is the same as your scene.
+
+![image](https://github.com/user-attachments/assets/7e0e5cc7-4fd7-458f-92a3-1cdeab66ee12)
+
+Make a build of your environment again. The skybox should now appear in Bigscreen.
+
+### Configuring shaders
+By default, if an object in your scene has a lightmap attached to it, the *Screen Lit* shader will get assigned to every material on the object. Often you would want to give objects a different look such as emissives or surfaces without screen light.
+
+Here you can assign a *Bigscreen Shaders* component to your mesh objects to control built-in shaders often used with Bigscreen.
+
+![image](https://github.com/user-attachments/assets/12ba449d-e9f2-4843-80d2-e5477583c408)
+
+Here is a breakdown of what each shader does:
+- **_Defaults_** -- this uses default shader assignment. Best to remove the *Bigscreen Shaders* component instead.
+- **_Screen Lit_** -- the shader used with objects intended to have screen lighting. Objects with this shader should have a baked lightmap attached otherwise the shader will not work appropriate.
+- **_Screen Lit Alpha Cutout_** -- similar to *Screen Lit* but supports transparency. Useful if an object has a transparent texture involved such as a 2D tree texture.
+- **_Dimmable Texture_** -- a simple texture shader but fades in brightness with the environment's ambient lighting.
+- **_Dimmable Texture Alpha Cutout_** -- similar to *Dimmable Texture* but supports transparency.
+- **_Dimmable Emissive Texture_** -- this shader works by giving any texture assigned to the *Emissive Texture* property a neon effect. The brightness fades with the ambient lighting. In most cases, assign the *Base Texture* and *Emissive Texture* the same object.
+- **_Dimmable Flat Color_** -- a simple color shader that fades with the ambient lighting.
+- **_Emissive Texture_** -- similar to *Dimmable Emissive Texture* but will be always-on which won't dim with ambient lighting.
+- **_Emissive Color_** -- similar to *Dimmable Flat Color* but will be always-on which won't dim with ambient lighting.
+
+Certain shader options give you some property controls such as brightness or the target material. If a target material is assigned, only that material gets the configured shader. By default, every material assigned to your object gets the shader change.
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+## 6) Exporting your environment for submitting
+When exporting your environment, you need to make sure all of your environment's assets are under _UserEnvironments_ and under the subfolders you created from _section 2_. Failure to do so could cause missing assets to occur when integrating your environment into Bigscreen. You must also export assets that are **only used in your environment** and no extra assets left over from other environment projects or what you no longer require.
 
 1. In the scene _Hierarchy_, we need to set the _Lighting_ object to inactive as it is only meant for lightbaking.
 2. Then we make the _Areas_ object active again. Its child objects such as _Seats_ must all be active as well. The _Areas_ object only needs to be inactive during lightbakes.
