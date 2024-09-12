@@ -499,7 +499,7 @@ Here you can assign a *Bigscreen Shaders* component to your mesh objects to cont
 ![image](https://github.com/user-attachments/assets/12ba449d-e9f2-4843-80d2-e5477583c408)
 
 Here is a breakdown of what each shader does:
-- **_Defaults_** -- this uses default shader assignment. Best to remove the *Bigscreen Shaders* component instead.
+- **_Custom_** -- this uses your own assigned shader which bypasses the default shader assignment.
 - **_Screen Lit_** -- the shader used with objects intended to have screen lighting. Objects with this shader should have a baked lightmap attached otherwise the shader will not work appropriate.
 - **_Screen Lit Alpha Cutout_** -- similar to *Screen Lit* but supports transparency. Useful if an object has a transparent texture involved such as a 2D tree texture.
 - **_Dimmable Texture_** -- a simple texture shader but fades in brightness with the environment's ambient lighting.
