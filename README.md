@@ -111,9 +111,12 @@ The order that users spawn into their seats is sorted based on the upper-most se
 
 
 ### Screens*
-Provided are two screen objects under _Areas_:
+Provided in the template are two screen objects under _Areas_:
 - **_ScreenPlaceholder_** -- this is where the primary screen will appear in your environment. It is where the host's desktop and any other screen-related content will be positioned at. You can adjust the position and rotation of this as you please. **There should only be one _ScreenPlaceholder_ in your environment.**
-- **_MirroredScreen_** (optional) -- this is a mirrored screen which as the name suggests will mirror what the room host's primary screen is showing. This is optional and if you don't plan to use mirrored screens, it is recommended to delete it from the scene. You can adjust the size of the mirrored screen by changing the size of the inner _ScreenBounds_ object inside the container. Do not change the rotation or position of the _ScreenBounds_ object. Only do that on the _MirroredScreen_ itself. You can duplicate the _MirroredScreen_ to add more screens but at this time, we require that you only have **30 mirrored screens** or less.
+- **_MirroredScreen_** (optional) -- this will mirror what the room host's primary screen is showing. This is optional and if you don't plan to use mirrored screens, it is recommended to delete it from the scene. You can adjust the size of the mirrored screen to anything. It is recommended to keep the aspect ratio 16:9 but it is not required for mirrored screens. Keep in mind, going outside 16:9 will stretch any content that's playing. You can duplicate the MirroredScreen object to add more screens but at this time, we require that you only have _30 mirrored screens_ or less.
+
+> [!CAUTION]
+> A _MirroredScreen_ should not be used as the primary screen users view in your environment. For example, you should not use a mirrored screen as a theater's main screen.
 
 > [!CAUTION]
 > The aspect ratio of the _ScreenPlaceholder_ must stay as **16:9**. Changing it outside of 16:9 will cause stretching issues of screen content in Bigscreen. You should scale the screens appropriately by enabling the _Scale Tool_ in Unity then dragging the center white cube of the scale tool to change the size of the screen.
